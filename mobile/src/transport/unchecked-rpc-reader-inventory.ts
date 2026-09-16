@@ -13,6 +13,11 @@
  * count went up. Replacing a reader with `rpcResultVariant(variant, schema)` lowers its line; the
  * list only shrinks.
  *
+ * A merge is the one case where a line goes up without a migration undoing itself: main can land an
+ * operation the branch never saw. Raise the line then, and name the PR that brought it, so the next
+ * reader can tell an import from a regression. #20954 brought three
+ * (`notification-stream-closed`, `native-chat-session-page`, `terminal-buffer-cleared`).
+ *
  * Two holes this list does not close, both deliberate:
  *   - A hand-written reader that returns `{ compatible: true, ... }` without going through those
  *     three helpers is not counted. It is the same hole with different bytes; the AST cannot tell
@@ -54,6 +59,7 @@ export const UNCHECKED_RPC_READERS: readonly UncheckedRpcReaderEntry[] = [
   // host-screen
   { file: 'src/host-screen/host-screen-operations.ts', readers: 8 },
   // notifications
+  { file: 'src/notifications/desktop-notification-stream-operations.ts', readers: 1 },
   { file: 'src/notifications/mobile-push-delivery-test-operations.ts', readers: 1 },
   { file: 'src/notifications/mobile-push-registration-operations.ts', readers: 2 },
   { file: 'src/notifications/push-dismissal-operations.ts', readers: 1 },
@@ -65,7 +71,7 @@ export const UNCHECKED_RPC_READERS: readonly UncheckedRpcReaderEntry[] = [
   { file: 'src/session/mobile-diff-review-operations.ts', readers: 3 },
   { file: 'src/session/mobile-review-terminal-operations.ts', readers: 3 },
   { file: 'src/session/mobile-session-launch-operations.ts', readers: 7 },
-  { file: 'src/session/mobile-session-read-operations.ts', readers: 10 },
+  { file: 'src/session/mobile-session-read-operations.ts', readers: 11 },
   { file: 'src/session/mobile-session-write-operations.ts', readers: 8 },
   // tasks
   { file: 'src/tasks/mobile-task-item-comment-operations.ts', readers: 7 },
@@ -78,7 +84,7 @@ export const UNCHECKED_RPC_READERS: readonly UncheckedRpcReaderEntry[] = [
   { file: 'src/tasks/mobile-workspace-create-operations.ts', readers: 4 },
   { file: 'src/tasks/mobile-workspace-source-operations.ts', readers: 7 },
   // terminal
-  { file: 'src/terminal/mobile-terminal-operations.ts', readers: 3 },
+  { file: 'src/terminal/mobile-terminal-operations.ts', readers: 4 },
   // transport
   { file: 'src/transport/host-status-probe-operations.ts', readers: 1 },
   { file: 'src/transport/mobile-relay-pairing-operations.ts', readers: 2 },
